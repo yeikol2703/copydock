@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CopyDock copiar/pegar</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <div class="left">
+      <img src="/icons/icon128.png" width="32" height="32" alt="CopyDock icon">
+      <h2>CopyDock</h2>
+    </div>
+
+    <div class="right">
+      <div class="tooltip-container" aria-label="Ayuda">
+        ❔
+        <span class="tooltip-text">Copia como siempre; el historial aparece aquí.</span>
+      </div>
+
+      <button id="theme" title="Cambiar tema" aria-label="Cambiar tema">
+        <img src="/icons/mode.png" alt="" width="20" height="20">
+      </button>
+
+      <button id="clear-all" title="Borrar todo" aria-label="Borrar todo">
+        <img src="/icons/clean.png" alt="" width="20" height="20">
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <div class="search-row">
+      <img src="/icons/search.png" alt="" width="16" height="16" aria-hidden="true">
+      <input id="search" type="search" placeholder="Buscar…">
+    </div>
+    <div id="list" aria-live="polite"></div>
+  </main>
+
+  <footer>
+    <small>All rights reserved. <a href="https://www.linkedin.com/in/yeikol-villalobos-1b784916a/" target="_blank">YV</a></small>
+  </footer>
+
+  <script src="popup.js" type="module"></script>
+</body>
+</html>
