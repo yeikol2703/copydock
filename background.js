@@ -50,56 +50,49 @@ async function togglePin(id) {
   }
 }
 
-async function writeClipboard(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 async function pasteIntoActiveTab(text) {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   if (!tab?.id) return;
 
-  await chrome.scripting.executeScript({
-    target: { tabId: tab.id },
-    func: (t) => {
-      const el = document.activeElement;
-      const isTextInput =
-        el &&
-        (el.tagName === "TEXTAREA" ||
-          (el.tagName === "INPUT" &&
-            /^(text|search|url|tel|password|email|number)$/i.test(el.type)) ||
+  if (chrome.scripting?.executeScript) {
+    await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      world: "MAIN",        
+      args: [text],
+      func: (t) => {
+        const el = document.activeElement;
+        const isTextInput =
+          el &&
+          (el.tagName === "TEXTAREA" ||
+            (el.tagName === "INPUT" &&
+              /^(text|search|url|tel|password|email|number)$/i.test(el.type)) ||
           el.isContentEditable);
 
-      if (isTextInput) {
-        if (
-          typeof el.selectionStart === "number" &&
-          typeof el.selectionEnd === "number"
-        ) {
-          const start = el.selectionStart;
-          const end = el.selectionEnd;
-          const val = el.value ?? el.textContent ?? "";
+        if (!isTextInput) {
+          navigator.clipboard?.writeText?.(t).catch(() => {});
+          alert("⚠️ Enfoca un campo de texto. El contenido se copió al portapapeles.");
+          return;
+        }
+
+        el.focus?.();
+
+        if (typeof el.selectionStart === "number" && typeof el.selectionEnd === "number") {
+          const start = el.selectionStart, end = el.selectionEnd;
+          const val = ("value" in el ? el.value : el.textContent) || "";
           const next = val.slice(0, start) + t + val.slice(end);
-          if ("value" in el) el.value = next;
-          else el.textContent = next;
+          if ("value" in el) el.value = next; else el.textContent = next;
           const caret = start + t.length;
           el.setSelectionRange?.(caret, caret);
           el.dispatchEvent(new Event("input", { bubbles: true }));
         } else {
-          document.execCommand("insertText", false, t);
+          try { document.execCommand("insertText", false, t); }
+          catch { el.textContent = (el.textContent || "") + t; }
         }
-      } else {
-        navigator.clipboard.writeText(t).catch(() => {});
-        alert(
-          "⚠️ No hay un campo de texto enfocado. El texto se copió al portapapeles."
-        );
       }
-    },
-    args: [text],
-  });
+    });
+  } else {
+    chrome.tabs.sendMessage(tab.id, { type: "PASTE_TEXT", text });
+  }
 }
 
 async function updateContextMenu(list) {
@@ -142,9 +135,6 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
     } else if (msg.type === "TOGGLE_PIN") {
       await togglePin(msg.id);
       sendResponse({ ok: true });
-    } else if (msg.type === "COPY_TO_CLIPBOARD") {
-      const ok = await writeClipboard(msg.text);
-      sendResponse({ ok });
     } else if (msg.type === "PASTE_INTO_ACTIVE") {
       await pasteIntoActiveTab(msg.text);
       sendResponse({ ok: true });

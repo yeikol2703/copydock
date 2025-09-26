@@ -53,14 +53,13 @@ function render(filter = "") {
     copyBtn.onclick = async () => {
       try {
         await navigator.clipboard.writeText(s.text);
-      } catch {
-        await send("COPY_TO_CLIPBOARD", { text: s.text });
+      } catch (e) {
+        console.log('No se pudo copiar:', e);
       }
-
       try {
-        await send("PASTE_INTO_ACTIVE", { text: s.text });
-      } catch {
-        /* silencioso */
+        await send("PASTE_INTO_ACTIVE", { text: s.text }); 
+      } catch (e) {
+        console.log('No se pudo pegar:', e);
       }
     };
 
@@ -168,7 +167,7 @@ themeBtn?.addEventListener("click", async () => {
   try {
     await chrome.storage.local.set({ [THEME_KEY]: next });
   } catch {
-    // silencioso si falla
+    console.log('Error al usar CopyDock');
   }
 });
 

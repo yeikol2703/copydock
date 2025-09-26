@@ -1,41 +1,50 @@
 {
-    "manifest_version": 3,
-    "name": "CopyDock copiar/pegar",
-    "description": "Copia varias cosas a la vez y elige cuál pegar.",
-    "version": "1.0.0",
-    "action": {
-      "default_popup": "popup.html",
-      "default_title": "CopyDock copiar/pegar"
-    },
-    "background": {
-      "service_worker": "background.js",
-      "type": "module"
-    },
-    "permissions": [
-      "storage",
-      "scripting",
-      "activeTab",
-      "clipboardRead",
-      "clipboardWrite",
-      "contextMenus"
-    ],
-    "host_permissions": [
-      "<all_urls>"
-    ],
-    "icons": {
-      "128": "icons/icon128.png"
-    },
-    "content_scripts": [
-      {
-        "matches": ["<all_urls>"],
-        "js": ["content.js"],
-        "run_at": "document_start"
-      }
-    ],
-    "commands": {
-      "_execute_action": {
-        "description": "Abrir CopyDock copiar/pegar"
-      }
+  "manifest_version": 3,
+  "name": "CopyDock — Multi Copy / Pegar",
+  "short_name": "CopyDock",
+  "description": "Copia varias cosas a la vez y elige cuál pegar.",
+  "version": "1.0.2",
+
+  "action": {
+    "default_title": "CopyDock",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "128": "icons/Icon128.png"
+    }
+  },
+
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+
+  "icons": {
+    "128": "icons/Icon128.png"
+  },
+
+  "permissions": [
+    "storage",
+    "clipboardWrite",
+    "scripting",
+    "contextMenus"
+  ],
+
+  "host_permissions": [
+    "<all_urls>"
+  ],
+
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start",     
+      "all_frames": true
+    }
+  ],
+
+  "commands": {
+    "_execute_action": {
+      "description": "Abrir CopyDock"
     }
   }
-  
+}
