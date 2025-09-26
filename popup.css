@@ -245,6 +245,9 @@ html[data-theme="dark"] .search-row img {
   filter: invert(1) brightness(2);
 
 }
+html[data-theme="dark"] button.pin img {
+  filter: none !important;
+}
 
 html[data-theme="light"] header .right button img,
 html[data-theme="light"] #list button.icon > img,
